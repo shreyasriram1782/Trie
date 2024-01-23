@@ -1,0 +1,87 @@
+class TrieNode:
+    def __init__(self):
+        # TrieNode has children and content
+        self.children = {}
+        self.content = ""
+
+class FileSystem:
+    def __init__(self):
+        # Initialize the file system with a TrieNode as the root
+        self.root = TrieNode()
+
+    def _get_node(self, path):
+        # Helper function to traverse the Trie and get the node for a given path
+        current = self.root
+        for dir_name in path.split('/'):
+            if dir_name:
+                current = current.children.setdefault(dir_name, TrieNode())
+        return current
+
+    def ls(self, path):
+        # List the contents of the directory specified by the path
+        node = self._get_node(path)
+        if node.content:
+            # If the node represents a file, return its name
+            return [path.split('/')[-1]]
+        # If the node represents a directory, return the sorted list of its children
+        return sorted(node.children.keys())
+
+    def mkdir(self, path):
+        # Create a new directory specified by the path
+        self._get_node(path)
+
+    def addContentToFile(self, filePath, content):
+        # Add content to a file or create a new file if it doesn't exist
+        node = self._get_node(filePath)
+        node.content += content
+
+    def readContentFromFile(self, filePath):
+        # Read content from a specified file
+        node = self._get_node(filePath)
+        return node.content
+
+# Example usage:
+fs = FileSystem()
+print(fs.ls("/"))  # Output: []
+fs.mkdir("/a/b/c")
+fs.addContentToFile("/a/b/c/d", "hello")
+print(fs.ls("/"))  # Output: ["a"]
+print(fs.readContentFromFile("/a/b/c/d"))  # Output: "hello"
+
+
+Algorithm:
+ls(path) Operation:
+Traverse the Trie to the node corresponding to the specified path.
+If the node represents a file (contains content), return a list containing 
+the file name (extracted from the path).
+If the node represents a directory, return a sorted list of its children (subdirectories and files).
+mkdir(path) Operation:
+Traverse the Trie to the node corresponding to the specified path.
+Ensure that the Trie nodes exist for each directory in the path. Create nodes if they don't exist.
+addContentToFile(filePath, content) Operation:
+Traverse the Trie to the node corresponding to the specified file path.
+Add the content to the content attribute of the Trie node representing the file.
+readContentFromFile(filePath) Operation:
+Traverse the Trie to the node corresponding to the specified file path.
+Return the content attribute of the Trie node representing the file.
+Time Complexity:
+Let L be the length of the path or file path in the given operations.
+
+ls(path): O(L) - Traversing the Trie to the specified path takes O(L), and listing the contents
+(if any) is done in O(K log K), where K is the number of children.
+mkdir(path): O(L) - Traversing the Trie to the specified path takes O(L), 
+and creating nodes is done in O(1) time for each level of the Trie.
+addContentToFile(filePath, content): O(L) - Traversing the Trie to the 
+specified file path takes O(L), and appending content is done in O(C), 
+where C is the length of the content.
+readContentFromFile(filePath): O(L) - Traversing the Trie to the specified 
+file path takes O(L), and reading the content is done in O(C), where C is the length of the content.
+Space Complexity:
+Let N be the total number of nodes in the Trie, and M be the total number of characters in the content.
+
+Trie Nodes: O(N) - Each directory and file creates a Trie node, and shared prefixes result in shared nodes.
+Content Storage: O(M) - The content of files is stored in Trie nodes.
+The overall space complexity is O(N + M).
+
+In summary, the Trie-based solution provides efficient time complexity 
+for the specified operations, and its space complexity is optimized due to shared nodes and space-efficient Trie structures.
