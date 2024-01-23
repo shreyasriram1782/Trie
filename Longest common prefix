@@ -1,0 +1,73 @@
+Approach:
+
+Build Trie:
+
+Iterate through each character of each input word and build a 
+trie data structure.
+Each node in the trie represents a character, and each path 
+from the root to a leaf node corresponds to a prefix of one of the input strings.
+Set a flag at the leaf node to indicate the end of a word.
+Traverse Trie for Longest Common Prefix:
+
+Traverse the trie from the root and move down until you reach a point 
+where there is a branching (more than one child) or a node representing the end of a word.
+The longest common prefix will be the characters encountered during this traversal.
+Time Complexity:
+
+Let n be the total number of characters in all words and m be the length of the longest word.
+Building the trie takes O(n) time as each character is processed once.
+Traversing the trie takes O(m) time in the worst case, where m is the length of the longest word.
+Space Complexity:
+
+The space complexity is dominated by the space required to store the trie.
+The trie will have O(n) nodes in the worst case (assuming no word is a prefix of another word).
+Each node has a constant amount of additional space for the children 
+dictionary and is_end_of_word flag.
+Therefore, the overall space complexity is O(n).
+Summary:
+
+The algorithm has a time complexity of O(n + m), where n is the total
+number of characters in all words, and m is the length of the longest word.
+The space complexity is O(n), where n is the total number of characters in all words.
+
+
+
+
+
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end_of_word = False
+
+def build_trie(words):
+    root = TrieNode()
+    
+    for word in words:
+        node = root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end_of_word = True
+    
+    return root
+
+def longest_common_prefix(words):
+    if not words:
+        return ""
+
+    root = build_trie(words)
+    common_prefix = []
+
+    node = root
+    while len(node.children) == 1 and not node.is_end_of_word:
+        char = next(iter(node.children))
+        common_prefix.append(char)
+        node = node.children[char]
+
+    return "".join(common_prefix)
+
+# Example usage:
+input_strings = ["flower", "flow", "flight"]
+result = longest_common_prefix(input_strings)
+print(result)
