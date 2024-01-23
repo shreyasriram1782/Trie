@@ -1,0 +1,78 @@
+Algorithm:
+1. TrieNode Class:
+Define a TrieNode class with attributes children 
+(a dictionary to store child nodes) and is_end_of_word 
+(a flag indicating whether the current node represents the end of a word).
+2. WordDictionary Class:
+Initialize the WordDictionary class with a TrieNode as the root.
+3. addWord(word) Operation:
+Start at the root of the trie.
+For each character in the word:
+If the character is not in the current node's children, 
+create a new TrieNode for that character.
+Move to the next node.
+Mark the last node as the end of the word.
+4. search(word) Operation:
+Implement a recursive helper function, search_helper(word, node), to perform the search.
+For each character in the word:
+If the character is '.', iterate through all the children nodes 
+and recursively search for the remaining word.
+If the character is not in the current node's children, return False.
+Move to the next node.
+Check if the last node represents the end of a word.
+
+
+The time complexity for both the addWord and search operations is O(L), 
+where L is the length of the word.
+The space complexity is O(N), where N is the total number of nodes in the trie.
+class TrieNode:
+    def __init__(self):
+        # TrieNode has children and is_end_of_word flag
+        self.children = {}
+        self.is_end_of_word = False
+
+class WordDictionary:
+    def __init__(self):
+        # Initialize the WordDictionary with a TrieNode as the root
+        self.root = TrieNode()
+
+    def addWord(self, word):
+        # Add a word to the trie
+        current = self.root
+        for char in word:
+            if char not in current.children:
+                # Create a new node for the character if it doesn't exist
+                current.children[char] = TrieNode()
+            # Move to the next node
+            current = current.children[char]
+        # Mark the end of the word
+        current.is_end_of_word = True
+
+    def search_helper(self, word, node):
+        # Recursive helper function for search
+        for i, char in enumerate(word):
+            if char == '.':
+                # If the character is '.', recursively search for the remaining word in all children
+                for child in node.children.values():
+                    if self.search_helper(word[i+1:], child):
+                        return True
+                return False
+            elif char not in node.children:
+                # If the character is not found, the word is not in the trie
+                return False
+            node = node.children[char]
+        return node.is_end_of_word
+
+    def search(self, word):
+        # Search for a word in the trie, supporting the dot character '.'
+        return self.search_helper(word, self.root)
+
+# Example usage:
+wordDict = WordDictionary()
+wordDict.addWord("bad")
+wordDict.addWord("dad")
+wordDict.addWord("mad")
+print(wordDict.search("pad"))   # Output: False
+print(wordDict.search("bad"))   # Output: True
+print(wordDict.search(".ad"))   # Output: True
+print(wordDict.search("b.."))   # Output: True
