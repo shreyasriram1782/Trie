@@ -1,0 +1,106 @@
+Algorithm:
+
+Build Trie:
+
+Build a trie (prefix tree) from the given list of words.
+Each node in the trie represents a character, and each path 
+from the root to a leaf node corresponds to a word in the list.
+Depth-First Search (DFS):
+
+Iterate through each cell (i, j) in the 2D board.
+For each cell, perform a DFS to explore possible words that can be 
+formed starting from that cell.
+During the DFS, check if the current path forms a valid word by traversing the trie.
+DFS Function:
+
+Implement a recursive DFS function that takes the current trie node, 
+current cell position (i, j), and the current path formed so far.
+If the current path forms a valid word, add it to the result.
+Mark the current cell as visited to avoid reusing it in the same word.
+Explore neighbors of the current cell, calling the DFS function recursively.
+Backtrack by unmarking the current cell.
+Results:
+
+The result is the list of words found during the DFS.
+
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end_of_word = False
+
+def build_trie(words):
+    root = TrieNode()
+    for word in words:
+        node = root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end_of_word = True
+    return root
+
+def find_words(board, words):
+    def dfs(node, i, j, path):
+        char = board[i][j]
+        current_node = node[char]
+
+        # Check if the current path forms a word
+        if current_node.is_end_of_word:
+            result.add(path)
+
+        # Mark the current cell as visited
+        visited.add((i, j))
+
+        # Explore neighbors
+        for ni, nj in [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)]:
+            if 0 <= ni < m and 0 <= nj < n and (ni, nj) not in visited:
+                next_char = board[ni][nj]
+                if next_char in current_node.children:
+                    dfs(current_node.children, ni, nj, path + next_char)
+
+        # Backtrack
+        visited.remove((i, j))
+
+    result = set()
+    trie_root = build_trie(words)
+    m, n = len(board), len(board[0])
+
+    for i in range(m):
+        for j in range(n):
+            if board[i][j] in trie_root.children:
+                visited = set()
+                dfs(trie_root.children, i, j, board[i][j])
+
+    return list(result)
+
+# Example usage:
+board = [
+    ['o', 'a', 'a', 'n'],
+    ['e', 't', 'a', 'e'],
+    ['i', 'h', 'k', 'r'],
+    ['i', 'f', 'l', 'v']
+]
+words = ["oath", "pea", "eat", "rain"]
+
+output = find_words(board, words)
+print(output)
+
+
+
+Time Complexity:
+
+Building Trie: Constructing the trie from the list of words takes O(L), 
+where L is the total number of characters in all words.
+Depth-First Search (DFS): The DFS is performed for each cell in the 2D board. 
+In the worst case, it explores all possible paths from each cell. 
+Therefore, the time complexity of DFS is O(N), where N is the total number of cells in the board.
+The overall time complexity is O(L + N).
+
+Space Complexity:
+
+Trie: The space required for the trie is O(L), where L is the total number of characters in all words.
+DFS Stack: The space used by the DFS stack during recursion is determined 
+by the maximum depth of the recursion. In the worst case, where each cell 
+in the board contributes to the depth of the recursion, the maximum depth is N (total number of cells in the board).
+Visited Set: The space used by the visited set to mark cells is O(N).
+The overall space complexity is O(L + N).
